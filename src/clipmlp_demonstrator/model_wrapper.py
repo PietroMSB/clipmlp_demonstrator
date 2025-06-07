@@ -5,15 +5,16 @@ from pandas import DataFrame
 from tqdm import tqdm
 import torch
 import os 
+import pickle
+import numpy as np
 from model_helpers.data_loader.common import AbstractDataLoader
 from model_helpers.post_process.common import AbstractPostProcessor
 from model_helpers.utils.codecs import dataframe_to_pil
 from model_helpers.utils.device import get_device
 from model_helpers.wrapper import ModelWrapper as BaseWrapper
 from transformers import CLIPModel, CLIPProcessor
-import torch
 
-from clipmlp_demonstrator.model_builder import get_network, build_transform
+from clipmlp_demonstrator.model_builder import get_network
 
 logger = logging.getLogger(__name__)
 
@@ -63,17 +64,16 @@ class ModelWrapper(BaseWrapper):
         self.clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-large-patch14-336")
         return self.clip_processor
 
-    def run_prediction(self, image: Image | DataFrame):
+    def run_prediction(self, image: Image | DataFrame) -> np.array:
         if not isinstance(image, Image):
              image = dataframe_to_pil(image, "RGB")           
         inputs = self.clip_processor(images=image, return_tensors="pt", padding=True)
         #process image with CLIP
-        image = self.transform(image)
-        fwith torch.no_grad():
+        with torch.no_grad():
             image_features = self.clip_model.get_image_features(**inputs)
         #normalize features
         image_features = image_features / image_features.norm(p=2, dim=-1, keepdim=True)
         #convert features to numpy array
-        image_features_np = image_features.cpu().numpy()[0]
+        image_features_np = np.reshape(image_features.cpu().numpy()[0], (1,-1))
         #predict
-        return self.mlp.predict(image_features_np)
+        return self.mlp.predict_proba(image_features_np)

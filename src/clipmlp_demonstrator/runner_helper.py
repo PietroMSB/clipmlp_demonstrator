@@ -3,6 +3,7 @@ import sys
 import os
 import pickle
 import numpy as np
+from pandas import DataFrame
 import sklearn.neural_network
 import sklearn.metrics
 import sklearn.ensemble
@@ -12,7 +13,7 @@ import sklearn.neighbors
 import json
 import warnings
 from transformers import CLIPModel, CLIPProcessor
-from PIL import Image, ImageEnhance, ImageFilter
+from PIL import Image, ImageEnhance, ImageFilter, ImageFile
 import torch
 
 from clipmlp_demonstrator.model_builder import get_network
@@ -36,7 +37,7 @@ class ClipMlpRunner:
         self.num_threads = num_threads
             
     @abstractmethod
-    def predict(self, image):      
+    def predict(self, image: Image.Image | DataFrame) -> np.array:      
         #extract features with clip
         inputs = self.clip_processor(images=image, return_tensors="pt", padding=True)
         with torch.no_grad():
@@ -44,8 +45,8 @@ class ClipMlpRunner:
         #normalize features
         image_features = image_features / image_features.norm(p=2, dim=-1, keepdim=True)
         #convert features to numpy array
-        image_features_np = image_features.cpu().numpy()[0]
+        image_features_np = np.reshape(image_features.cpu().numpy()[0], (1,-1))
         #predict
-        return self.mlp.predict(image_features_np)
+        return self.mlp.predict_proba(image_features_np)
 
 

@@ -37,7 +37,7 @@ def run_method(device, phase, run_name, model_flag, model_freeze, min_vram, load
     print("Current working directory:", os.getcwd())
     num_threads = os.cpu_count() // 2
     model = ClipMlpRunner(model_flag,device, load_id, num_threads, phase)
-    # inti the mlflow run for storing metrics and artifacts
+    # init the mlflow run for storing metrics and artifacts
     with mlflow.start_run(run_name=run_name) as run: 
         wrapper = ModelWrapper(
             model_class=model_flag,
@@ -47,12 +47,12 @@ def run_method(device, phase, run_name, model_flag, model_freeze, min_vram, load
         )
         image_path = './img_prova.png'
         image = Image.open(image_path).convert("RGB")
-        prediction = model.predict(image)
+        prediction = np.argmax(model.predict(image)[0])
         mlflow.log_metric("generetor N", prediction)
         # infer signature
         upload_artifact(
             image_path,
-            artifact_path='runs/checkpoints/train_mlp.pkl',
+            artifact_path='clipmlp_demonstrator/weights/mlp_weights.pkl',
             model_class=model_flag,
             model_freeze=model_freeze,
         )

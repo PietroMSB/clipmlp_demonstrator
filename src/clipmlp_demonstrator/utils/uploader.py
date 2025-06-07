@@ -24,9 +24,11 @@ def upload_artifact(image_path, artifact_path, model_class: str, model_freeze: b
             post_processors_class=BasePostProcessor,
         )
         model = deepcopy(wrapper)
-        model.load_model(artifact_path1, artifact_path2)
+        model.load_model(artifact_path)
         # Use the loader's expected input format for signature and input_example
+        print(loader_class)
         model_input_signature = loader_class.get_data_example()
+        print(loader_class.get_data_example())
         input_example = model_input_signature.head()
         # Use real image only for test prediction, not for logging
         image = Image.open(image_path).convert("RGB")

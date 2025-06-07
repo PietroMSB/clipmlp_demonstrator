@@ -25,7 +25,7 @@ def get_requirements():
         "transformers==4.52.4",
         "huggingface_hub==0.32.4",
         "tokenizers==0.21.1",
-        "packaging==25.0",
+        "packaging==24.2",
         "PyYAML==6.0.2",
         "regex==2024.11.6",
         "safetensors==0.5.3",
@@ -38,9 +38,9 @@ def get_requirements():
         "certifi==2025.4.26"
     ]
 
-def get_network(model_name: str, task: str) -> nn.Module:
+def get_network(model_name: str, task: str):
     if model_name == "clipmlp":   
-        in_file = open("weights/mlp_wights.pkl", 'rb')
+        in_file = open("clipmlp_demonstrator/weights/mlp_weights.pkl", 'rb')
         model = pickle.load(in_file)
         in_file.close()
         return model
