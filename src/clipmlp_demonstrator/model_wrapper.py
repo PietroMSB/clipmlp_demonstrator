@@ -14,7 +14,7 @@ from model_helpers.utils.device import get_device
 from model_helpers.wrapper import ModelWrapper as BaseWrapper
 from transformers import CLIPModel, CLIPProcessor
 
-from clipmlp_demonstrator.model_builder import get_network
+from clipmlp_demonstrator.model_builder import get_network, MLP
 
 logger = logging.getLogger(__name__)
 
@@ -56,9 +56,8 @@ class ModelWrapper(BaseWrapper):
         self.clip_model = CLIPModel.from_pretrained("openai/clip-vit-large-patch14-336")
         self.clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-large-patch14-336")
         logger.info(f"Loading model from: {artifact_path}")
-        in_file = open(artifact_path, 'rb')
-        self.mlp = pickle.load(in_file)
-        in_file.close()
+        self.mlp = get_network("clipmlp", "task")
+        self.mlp.load_state_dict(torch.load(artifact_path))
         
     def preprocess_image(self, device):
         self.clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-large-patch14-336")
@@ -76,4 +75,4 @@ class ModelWrapper(BaseWrapper):
         #convert features to numpy array
         image_features_np = np.reshape(image_features.cpu().numpy()[0], (1,-1))
         #predict
-        return self.mlp.predict_proba(image_features_np)
+        return self.mlp.predict(torch.from_numpy(image_features_np))

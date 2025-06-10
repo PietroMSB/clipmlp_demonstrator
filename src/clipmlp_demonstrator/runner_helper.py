@@ -47,6 +47,6 @@ class ClipMlpRunner:
         #convert features to numpy array
         image_features_np = np.reshape(image_features.cpu().numpy()[0], (1,-1))
         #predict
-        return self.mlp.predict_proba(image_features_np)
+        return self.mlp.predict(torch.from_numpy(image_features_np))
 
 
