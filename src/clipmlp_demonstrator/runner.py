@@ -50,7 +50,7 @@ def run_method(device, phase, run_name, model_flag, model_freeze, min_vram, load
         prediction = np.argmax(model.predict(image)[0])
         mlflow.log_metric("generetor N", prediction)
         # infer signature
-        upload_artifact(
+        upload_artifact( 
             image_path,
             artifact_path='clipmlp_demonstrator/weights/mlp_weights.pth',
             model_class=model_flag,

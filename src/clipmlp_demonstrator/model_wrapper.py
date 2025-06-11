@@ -75,4 +75,14 @@ class ModelWrapper(BaseWrapper):
         #convert features to numpy array
         image_features_np = np.reshape(image_features.cpu().numpy()[0], (1,-1))
         #predict
-        return self.mlp.predict(torch.from_numpy(image_features_np))
+        predictions = self.mlp.predict(torch.from_numpy(image_features_np)).cpu().numpy()[0]
+        class_labels = [
+            'AdobeFirefly', 'Dall-E3', 'Flux.1', 'Flux.1.1Pro', 'Freepik',
+            'LeonardoAI', 'Midjourney', 'StableDiffusion3.5', 'StableDiffusionXL', 'StarryAI'
+            ]
+        
+        dict_result = {}
+        for idx, pred in enumerate(predictions):
+            dict_result[class_labels[idx]] = pred
+        return dict_result
+        #return out

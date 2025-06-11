@@ -15,7 +15,7 @@ mlp_tolerance = 10
 
 #MLP class
 class MLP(torch.nn.Module):
-    def __init__(self, input_size, hidden_sizes, output_size, activation, save_path):
+    def __init__(self, input_size, hidden_sizes, output_size, activation, save_path="clipmlp_demonstrator/weights/mlp_weights.pth"):
         super(MLP, self).__init__()
         layers = []
         in_size = input_size
@@ -77,6 +77,7 @@ class MLP(torch.nn.Module):
 def get_requirements():
     return [
         "--index-url https://gitlab.com/api/v4/projects/70323435/packages/pypi/simple",
+        "model_helpers==0.1.0",
         "numpy==2.2.6",
         "scikit-learn==1.6.1",
         "scipy==1.15.3",
@@ -106,13 +107,14 @@ def get_requirements():
         "charset_normalizer==3.4.2",
         "idna==3.10",
         "urllib3==2.4.0",
-        "certifi==2025.4.26"
-        "model-helpers==0.1.0"
+        "certifi==2025.4.26",
+        "mlflow==2.22.0",
+        "mlflow-skinny==2.22.0"
     ]
 
 def get_network(model_name: str, task: str):
     if model_name == "clipmlp":   
-        return MLP(768, mlp_hidden_layers, 10, mlp_activation, "clipmlp_demonstrator/weights/mlp_weights.pth")
+        return MLP(768, mlp_hidden_layers, 10, mlp_activation)
     else:
         raise ValueError(f"Unsupported model_name: {model_name}. Currently only 'clipmlp' is supported.")
 
